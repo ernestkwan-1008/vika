@@ -60,10 +60,16 @@ export function isRiskOverdue(status: RiskStatus, dueDate: string | null | undef
 	return !Number.isNaN(due.getTime()) && due.getTime() < now.getTime()
 }
 
-// Colours of a rating, as CSS variables of the theme, with a plain fallback for the print view.
-export const RISK_RATING_COLORS: Record<RiskRating, {background: string, text: string, print: string}> = {
-	low: {background: 'var(--success)', text: 'var(--white)', print: '#8bc34a'},
-	medium: {background: 'var(--warning)', text: 'var(--grey-900)', print: '#ffc107'},
-	high: {background: 'var(--orange, #f57c00)', text: 'var(--white)', print: '#fb8c00'},
-	critical: {background: 'var(--danger)', text: 'var(--white)', print: '#e53935'},
+// The colours of a rating on paper and in a spreadsheet, the one place they are defined: the print
+// page and the Excel fills are both built from it. The on-screen badge uses the theme instead.
+export const RISK_RATING_PAPER_COLORS: Record<RiskRating, {background: string, text: string}> = {
+	low: {background: '#8bc34a', text: '#000000'},
+	medium: {background: '#ffc107', text: '#000000'},
+	high: {background: '#fb8c00', text: '#ffffff'},
+	critical: {background: '#e53935', text: '#ffffff'},
+}
+
+// '#8bc34a' as the ARGB value of a spreadsheet fill.
+export function paperColorToArgb(hex: string): string {
+	return `FF${hex.replace('#', '').toUpperCase()}`
 }

@@ -65,7 +65,8 @@
 						<td
 							v-for="(cell, cellIndex) in row"
 							:key="cellIndex"
-							:class="cellIndex === table.ratingColumn ? `rating is-${table.ratings[index]}` : undefined"
+							:class="cellIndex === table.ratingColumn ? 'rating' : undefined"
+							:style="cellIndex === table.ratingColumn ? ratingStyle(table.ratings[index]) : undefined"
 						>
 							{{ cell }}
 						</td>
@@ -97,6 +98,8 @@ import type {
 	RiskPrintFormatters,
 } from '@/helpers/export/riskExport'
 import {describeRiskFilters, queryToRiskFilters, withEffectiveStatuses} from '@/helpers/riskFilterQuery'
+import {RISK_RATING_PAPER_COLORS} from '@/helpers/riskRating'
+import type {RiskRating} from '@/helpers/riskRating'
 import {getErrorText} from '@/message'
 
 defineOptions({name: 'RisksPrint'})
@@ -155,6 +158,12 @@ async function load() {
 	const result = await fetchAllRisks(null, withEffectiveStatuses(filters.value))
 	truncated.value = result.truncated
 	table.value = buildRiskPrintTable(result.risks, singleProject.value === null, lookups.value, fmt, labels.value)
+}
+
+// The colours come from the table the Excel export uses too.
+function ratingStyle(rating: RiskRating) {
+	const colors = RISK_RATING_PAPER_COLORS[rating]
+	return {background: colors.background, color: colors.text}
 }
 
 function printNow() {
@@ -244,24 +253,6 @@ onMounted(async () => {
 	td.rating {
 		font-weight: bold;
 		text-align: center;
-
-		&.is-low {
-			background: #8bc34a;
-		}
-
-		&.is-medium {
-			background: #ffc107;
-		}
-
-		&.is-high {
-			background: #fb8c00;
-			color: #fff;
-		}
-
-		&.is-critical {
-			background: #e53935;
-			color: #fff;
-		}
 	}
 }
 

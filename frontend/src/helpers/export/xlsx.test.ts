@@ -1,5 +1,6 @@
 import {describe, expect, it} from 'vitest'
 
+import {paperColorToArgb, RISK_RATING_PAPER_COLORS, RISK_RATINGS} from '@/helpers/riskRating'
 import {crc32, createZip} from './zip'
 import {buildXlsx, columnName, escapeXml, excelSerial, sheetNames} from './xlsx'
 
@@ -199,6 +200,14 @@ describe('buildXlsx', () => {
 		expect(styles).toContain('<cellXfs count="13">')
 		expect(styles).toContain('numFmtId="164"')
 		expect(styles).toContain('<fills count="11">')
+	})
+
+	it('fills the risk ratings with the colours of the print view', () => {
+		const styles = readZip(buildXlsx([sheet])).get('xl/styles.xml') as string
+		for (const rating of RISK_RATINGS) {
+			expect(styles).toContain(`<fgColor rgb="${paperColorToArgb(RISK_RATING_PAPER_COLORS[rating].background)}"/>`)
+		}
+		expect(paperColorToArgb('#8bc34a')).toBe('FF8BC34A')
 	})
 
 	it('writes text in any script', () => {

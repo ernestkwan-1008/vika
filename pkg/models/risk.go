@@ -17,6 +17,7 @@
 package models
 
 import (
+	"fmt"
 	"strings"
 	"time"
 	"unicode/utf8"
@@ -70,6 +71,39 @@ var riskRatingBands = []struct {
 	{RiskRatingMedium, 5, 9},
 	{RiskRatingHigh, 10, 16},
 	{RiskRatingCritical, 17, 25},
+}
+
+// RiskStatuses returns every status a risk can have.
+func RiskStatuses() []string {
+	return append([]string(nil), riskStatuses...)
+}
+
+// RiskRatings returns every rating, lowest first.
+func RiskRatings() []string {
+	ratings := make([]string, 0, len(riskRatingBands))
+	for _, band := range riskRatingBands {
+		ratings = append(ratings, band.Rating)
+	}
+	return ratings
+}
+
+// RiskSortKeys returns every key a list can be sorted by.
+func RiskSortKeys() []string {
+	keys := make([]string, 0, len(riskSortColumns))
+	for key := range riskSortColumns {
+		keys = append(keys, key)
+	}
+	return keys
+}
+
+// RiskScoreRangeDoc describes the rating bands as text, for API documentation. It is built from
+// riskRatingBands so the text cannot drift from the real bands.
+func RiskScoreRangeDoc() string {
+	parts := make([]string, 0, len(riskRatingBands))
+	for _, band := range riskRatingBands {
+		parts = append(parts, fmt.Sprintf("%s %d-%d", band.Rating, band.Min, band.Max))
+	}
+	return strings.Join(parts, ", ")
 }
 
 // RiskScore is probability times impact.
@@ -473,12 +507,6 @@ var riskSortColumns = map[string]string{
 	"created":     "risks.created",
 	"updated":     "risks.updated",
 	"id":          "risks.id",
-}
-
-// IsValidRiskSortKey reports whether a list can be sorted by the key.
-func IsValidRiskSortKey(key string) bool {
-	_, ok := riskSortColumns[key]
-	return ok
 }
 
 func (r *Risk) orderBy() (string, error) {

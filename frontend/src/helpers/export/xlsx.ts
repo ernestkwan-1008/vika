@@ -1,3 +1,4 @@
+import {paperColorToArgb, RISK_RATING_PAPER_COLORS, RISK_RATINGS} from '@/helpers/riskRating'
 import {createZip, type ZipEntry} from './zip'
 
 // A small, dependency-free .xlsx writer: text, numbers, booleans and dates, a styled and frozen
@@ -188,11 +189,8 @@ const STYLES_XML = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' +
 	'<fill><patternFill patternType="solid"><fgColor rgb="FF374151"/><bgColor indexed="64"/></patternFill></fill>' +
 	'<fill><patternFill patternType="solid"><fgColor rgb="FFF59E0B"/><bgColor indexed="64"/></patternFill></fill>' +
 	'<fill><patternFill patternType="solid"><fgColor rgb="FFEF4444"/><bgColor indexed="64"/></patternFill></fill>' +
-	// Risk ratings, same colours as the print view (low, medium, high, critical).
-	'<fill><patternFill patternType="solid"><fgColor rgb="FF8BC34A"/><bgColor indexed="64"/></patternFill></fill>' +
-	'<fill><patternFill patternType="solid"><fgColor rgb="FFFFC107"/><bgColor indexed="64"/></patternFill></fill>' +
-	'<fill><patternFill patternType="solid"><fgColor rgb="FFFB8C00"/><bgColor indexed="64"/></patternFill></fill>' +
-	'<fill><patternFill patternType="solid"><fgColor rgb="FFE53935"/><bgColor indexed="64"/></patternFill></fill>' +
+	// Risk ratings (low, medium, high, critical), from the same table as the print view.
+	RISK_RATINGS.map(rating => `<fill><patternFill patternType="solid"><fgColor rgb="${paperColorToArgb(RISK_RATING_PAPER_COLORS[rating].background)}"/><bgColor indexed="64"/></patternFill></fill>`).join('') +
 	'</fills>' +
 	'<borders count="1"><border><left/><right/><top/><bottom/><diagonal/></border></borders>' +
 	'<cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs>' +
