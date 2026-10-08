@@ -1,0 +1,56 @@
+# Local development configuration (gitignored).
+database:
+  type: postgres
+  host: localhost:5432
+  user: vika
+  password: KmiAED1EsGk6QDmz5rHWh84O73dgHFUH
+  database: vika
+  sslmode: disable
+
+service:
+  publicurl: https://vika.hshd.com.hk/
+  # Users come from Entra, the daily user list import or an admin. Nobody registers themselves.
+  enableregistration: false
+  # Not used: no calendar or task apps connect to this instance.
+  enablecaldav: false
+  # The default admin (admin / admin123) is created on first start and must change the password at the first login.
+  # Set your own initial password before the first start if the instance is reachable from outside:
+  # defaultadminpassword: <INITIAL_PASSWORD>
+  # TODO: uncomment once the reverse proxy CIDR is known. Behind a proxy the
+  # client IP is otherwise the proxy's address, which skews rate limiting.
+  # ipextractionmethod: xff
+  # trustedproxies: <PROXY_CIDR>
+
+# Microsoft Entra ID single sign-on.
+# Local login stays ON (default) until Entra works end to end. Once the
+# provider below is filled in and a test login succeeds, set:
+#   auth.local.enabled: false   and   auth.openid.enabled: true
+# Redirect URIs to register in Entra (Web platform, not SPA):
+#   https://vika.hshd.com.hk/auth/openid/entra
+#   https://vika.hshd.com.hk/
+# Do NOT put the client secret in this file for production; see the plan.
+auth:
+  local:
+    enabled: true
+  openid:
+    enabled: false
+    # providers:
+    #   entra:
+    #     name: Microsoft Entra ID
+    #     authurl: https://login.microsoftonline.com/<TENANT_ID>/v2.0
+    #     clientid: <CLIENT_ID>
+    #     clientsecret: <CLIENT_SECRET>
+    #     scope: openid profile email
+
+# Daily refresh of the users table from a CSV (see config-raw.json, section userimport).
+# People in the file are created/updated (name, jobTitle, department) by matching mail; every
+# other user that signs in through Entra is deactivated. Admins, bots and local/LDAP/other-OIDC accounts are never touched.
+# dryrun defaults to true: read the "[User Import Cron] Done" log line first, then set it to false. Single instance only.
+userimport:
+  enabled: false
+  file: /data/vika/import/user_list.csv
+  schedule: "30 7 * * *"
+  maxdisablepercent: 20
+  maxfileageh: 26
+  # tenantid: <TENANT_ID>   # optional; set it if more than one Entra tenant is configured
+  dryrun: true
